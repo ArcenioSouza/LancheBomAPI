@@ -12,5 +12,9 @@ namespace LancheBom.Database
         {
 
         }
+
+        public ApplicationDbContext()
+        {
+        }
     }
 }

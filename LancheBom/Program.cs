@@ -1,4 +1,5 @@
 using LancheBom.Database;
+using LancheBom.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -12,6 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("ConnectionSQLite")));
 builder.Services.AddCors();
+builder.Services.AddScoped<PedidoService>();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Lanche Bom", Version = "v1" });
