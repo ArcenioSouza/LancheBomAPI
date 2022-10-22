@@ -16,14 +16,6 @@ namespace LancheBom.Controllers
             _context = context;
         }
 
-        [HttpPost]
-        public async Task<ActionResult> cadastrarAdicional(Adicional adicional)
-        {
-            await _context.Adicionais.AddAsync(adicional);
-            await _context.SaveChangesAsync();
-            return Created("", adicional);
-        }
-
         [HttpGet]
         public async Task<ActionResult> obterAdicional()
         {

@@ -2,7 +2,6 @@ using LancheBom.Database;
 using LancheBom.Models;
 using LancheBom.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using LancheBom.DTO;
 
 namespace LancheBom.Controllers
@@ -11,23 +10,19 @@ namespace LancheBom.Controllers
     [Route("/api/v1/pedido")]
     public class PedidoController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly PedidoService _service;
 
-        public PedidoController(ApplicationDbContext context, PedidoService service)
+        public PedidoController(PedidoService service)
         {
-            _context = context;
             _service = service;
         }
 
         [HttpPost]
-        public async Task<ActionResult> cadastrarPedido(PedidoDTO pedidoDTO)
+        public async Task<ActionResult> enviarPedido(PedidoDTO pedidoDTO)
         {
             try
             {
-                Pedido pedido = await _service.gerarPedido(pedidoDTO.idLanche, pedidoDTO.idAdicional1, pedidoDTO.idAdicional2);
-                await _context.Pedidos.AddAsync(pedido);
-                await _context.SaveChangesAsync();
+                Pedido pedido = await _service.gerarPedido(pedidoDTO.idLanche, pedidoDTO.idAdicionais);
                 return Created("", pedido);
             }
             catch(ArgumentNullException ex)
@@ -44,9 +39,64 @@ namespace LancheBom.Controllers
         [HttpGet]
         public async Task<ActionResult> obterPedidos()
         {
-            List<Pedido> pedidos = await _context.Pedidos.Include(lanche => lanche.Lanche).Include(adicionais => adicionais.Adicionais).ToListAsync();
-            return Ok(pedidos);
+            try
+            {
+                List<Pedido> pedidos = await _service.buscarPedidos();
+
+                var resposta = pedidos.Select(pedido => new
+                {
+                    Id = pedido.Id,
+                    Lanche = pedido.Lanche,
+                    Adicionais = pedido.PedidoAdicional.Select(a => a.AdicionalId).ToList(),
+                    ValorPedido = pedido.ValorPedido
+                });
+
+                return Ok(resposta);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return NotFound(ex.ParamName);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }            
+        }       
+
+        [HttpPut("atualizar/{id}")]
+        public async Task<ActionResult> atualizarPedido(int id, PedidoDTO pedidoDTO)
+        {
+            try
+            {
+                var resposta = await _service.atualizarPedido(id, pedidoDTO.idLanche, pedidoDTO.idAdicionais);               
+                return Ok(resposta);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return NotFound(ex.ParamName);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> ExcluirRegistro(int id)
+        {
+            try
+            {
+                string resposta = await _service.apagarPedido(id);
+                return Ok(resposta);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return NotFound(ex.ParamName);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }            
+        }
     }
 }

@@ -1,9 +1,10 @@
+using LancheBom.Models;
+
 namespace LancheBom.DTO
 {
    public class PedidoDTO
    {
       public int idLanche { get; set; }
-      public int idAdicional1 { get; set; }
-      public int idAdicional2 { get; set; }
-   }
+      public int[] idAdicionais { get; set; } = new int[2];        
+   }    
 }

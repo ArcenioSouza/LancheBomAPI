@@ -16,19 +16,20 @@ namespace LancheBom.Controllers
             _context = context;
         }
 
-        [HttpPost]
-        public async Task<ActionResult> cadastrarLanche(Lanche lanche)
-        {
-            await _context.Lanches.AddAsync(lanche);
-            await _context.SaveChangesAsync();
-            return Created("", lanche);
-        }
-
         [HttpGet]
         public async Task<ActionResult> obterLanches()
         {
             List<Lanche> listaDeLanches = await _context.Lanches.ToListAsync();
             return Ok(listaDeLanches);
+        }
+
+        [HttpGet("adicional")]
+        public async Task<ActionResult> obterLanchesEAdicionais()
+        {
+            List<Lanche> listaDeLanches = await _context.Lanches.ToListAsync();
+            List<Adicional> listaDeAdicionais = await _context.Adicionais.ToListAsync();
+         
+            return Ok(new { lanches = listaDeLanches, adicionais = listaDeAdicionais });
         }
     }
 }
