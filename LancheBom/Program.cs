@@ -1,7 +1,6 @@
 using LancheBom.Database;
 using LancheBom.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
@@ -14,8 +13,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 //builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("ConnectionSQLite")));
-string mySqlConnection = builder.Configuration.GetConnectionString("ConnectionMySQL");
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(mySqlConnection, ServerVersion.AutoDetect(mySqlConnection)));
+//string mySqlConnection = builder.Configuration.GetConnectionString("ConnectionMySQL");
+//builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(mySqlConnection, ServerVersion.AutoDetect(mySqlConnection)));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase("lanche_bom"));
+
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddCors();
@@ -33,6 +34,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+var scopeService = app.Services.CreateScope();
+
+var context = scopeService.ServiceProvider.GetService<ApplicationDbContext>();
+AdicionarDados adicionarDados = new AdicionarDados();
+adicionarDados.AdicionarDadosNoBanco(context);
 
 app.UseHttpsRedirection();
 
