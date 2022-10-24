@@ -40,8 +40,8 @@ namespace LancheBom.Database
             Adicional adicional2 = new Adicional()
             {
                 Id = 2,
-                Nome = "Batata Frita",
-                Preco = 2.00
+                Nome = "Refrigerante",
+                Preco = 2.50
             };
 
             context.Adicionais.Add(adicional1);

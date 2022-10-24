@@ -9,7 +9,6 @@ namespace LancheBom.Database
         {
             
         }
-
         public DbSet<Lanche> Lanches { get; set; }
         public DbSet<Adicional> Adicionais { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }
